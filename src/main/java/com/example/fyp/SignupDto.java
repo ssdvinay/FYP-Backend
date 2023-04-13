@@ -15,6 +15,8 @@ public class SignupDto {
     private List<Long> supportedProductTypes;
     private double price;
 
+    private boolean blacklisted;
+
     public String getFirstName() {
         return firstName;
     }
@@ -110,5 +112,13 @@ public class SignupDto {
 
     public void setPrice(double price) {
         this.price = price;
+    }
+
+    public boolean isBlacklisted() {
+        return blacklisted;
+    }
+
+    public void setBlacklisted(boolean blacklisted) {
+        this.blacklisted = blacklisted;
     }
 }

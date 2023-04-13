@@ -15,6 +15,8 @@ public class Dealer {
 
     private String approvalStatus;
 
+    private String showroomPicture;
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id", referencedColumnName = "id")
     private User user;
@@ -61,5 +63,13 @@ public class Dealer {
 
     public void setDealerCarProductList(Set<DealerCarProduct> dealerCarProductList) {
         this.dealerCarProductList = dealerCarProductList;
+    }
+
+    public String getShowroomPicture() {
+        return showroomPicture;
+    }
+
+    public void setShowroomPicture(String showroomPicture) {
+        this.showroomPicture = showroomPicture;
     }
 }

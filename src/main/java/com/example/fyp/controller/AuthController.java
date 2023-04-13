@@ -5,19 +5,24 @@ import com.example.fyp.SignupDto;
 import com.example.fyp.Util;
 import com.example.fyp.entity.*;
 import com.example.fyp.repository.CustomerRepository;
+import com.example.fyp.repository.DealerCarProductRepository;
 import com.example.fyp.repository.DealerRepository;
 import com.example.fyp.repository.UserRepository;
-import org.jetbrains.annotations.NotNull;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "*")
 @RestController
 public class AuthController {
 
@@ -45,7 +50,9 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Response<String>> register(@RequestBody @NotNull SignupDto dto) {
+    public ResponseEntity<Response<String>> register(@RequestParam("file") MultipartFile file, @RequestParam("user") String data) throws IOException {
+        SignupDto dto = new ObjectMapper().readValue(data, SignupDto.class);
+
         if (userRepository.existsUserByUsername(dto.getUsername()))
             return new ResponseEntity<>(new Response<>("Username already exists!"), HttpStatus.BAD_REQUEST);
 
@@ -69,11 +76,20 @@ public class AuthController {
         try {
             userRepository.save(user);
             if (dto.getRole().equals("DEALER")) {
+                String path = "pictures/" + user.getId() + "/";
+                File dir = new File(path);
+                if (!dir.exists())
+                    dir.mkdirs();
+
+                try (FileOutputStream fileOutputStream = new FileOutputStream(path + file.getOriginalFilename())) {
+                    fileOutputStream.write(file.getBytes());
+                }
                 Dealer dealer = new Dealer();
                 dealer.setId(user.getId());
                 dealer.setUser(user);
                 dealer.setShowRoomAddress(dto.getAddress());
                 dealer.setApprovalStatus("PENDING");
+                dealer.setShowroomPicture(file.getOriginalFilename());
                 dealerRepository.save(dealer);
                 List<DealerCarProduct> dealerCarProductList = new ArrayList<>();
                 for (Long carType : dto.getSupportedCarTypes()) {
@@ -96,6 +112,7 @@ public class AuthController {
                 customer.setAddress(dto.getAddress());
                 customerRepository.save(customer);
             }
+
             return new ResponseEntity<>(new Response<>("User registered successfully"), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new Response<>(Util.getRootCause(e)), HttpStatus.BAD_REQUEST);
