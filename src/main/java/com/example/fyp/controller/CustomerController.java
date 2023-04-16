@@ -33,7 +33,9 @@ public class CustomerController {
         return this.dealerCarProductRepository.getFilteredDealers(showroomFilters.minPrice,
                 showroomFilters.maxPrice,
                 new HashSet<>(showroomFilters.carTypes),
-                new HashSet<>(showroomFilters.productTypes));
+                new HashSet<>(showroomFilters.productTypes),
+                "APPROVED",
+                false);
     }
 
     @GetMapping("/image/{dealerId}/{filename}")
