@@ -14,11 +14,20 @@ import java.util.Set;
 @Repository
 public interface DealerCarProductRepository extends JpaRepository<DealerCarProduct, DealerAssociationId> {
 
-    @Query("SELECT new com.example.fyp.dto.Showroom(d.dealer, d.price) FROM DealerCarProduct d WHERE d.price >= :minPrice and d.price <= :maxPrice and d.dealerAssociationId.carTypeId IN :carTypes and d.dealerAssociationId.productTypeId IN :productTypes and d.dealer.approvalStatus = :approved and d.dealer.user.isBlacklisted = :isBlacklisted group by d.dealerAssociationId.dealerId, d.price")
+    @Query("SELECT new com.example.fyp.dto.Showroom(d.dealer, d.price) FROM DealerCarProduct d " +
+            "WHERE d.price >= :minPrice " +
+            "and d.price <= :maxPrice " +
+            "and d.dealerAssociationId.carTypeId IN :carTypes " +
+            "and d.dealerAssociationId.productTypeId IN :productTypes " +
+            "and d.dealer.approvalStatus = 'APPROVED' " +
+            "and d.dealer.user.isBlacklisted = false " +
+            "group by d.dealerAssociationId.dealerId, d.price " +
+            "HAVING COUNT(DISTINCT d.dealerAssociationId.carTypeId) >= :numCarTypes " +
+            "AND COUNT(DISTINCT d.dealerAssociationId.productTypeId) >= :numProductTypes")
     List<Showroom> getFilteredDealers(@Param("minPrice") double minPrice,
                                       @Param("maxPrice") double maxPrice,
                                       @Param("carTypes") Set<Long> carTypes,
                                       @Param("productTypes") Set<Long> productTypes,
-                                      @Param("approved") String approved,
-                                      @Param("isBlacklisted") boolean isBlacklisted);
+                                      @Param("numCarTypes") long numCarTypes,
+                                      @Param("numProductTypes") long numProductTypes);
 }
