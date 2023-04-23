@@ -13,6 +13,9 @@ import java.util.List;
 @Repository
 public interface DealerRepository extends JpaRepository<Dealer, Long> {
 
+    @Query("select d from Dealer d where d.user.email = :emailOrUsername or d.user.username = :emailOrUsername")
+    Dealer findByEmailOrUsername(@Param("emailOrUsername") String emailOrUsername);
+
     Dealer findDealerById(Long id);
 
     List<Dealer> findDealersByApprovalStatus(String approvalStatus);

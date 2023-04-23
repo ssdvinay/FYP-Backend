@@ -49,13 +49,8 @@ public class AuthController {
         return new ResponseEntity<>(new Response<>("Login Successful", null), HttpStatus.OK);
     }
 
-    @PostMapping("/register-customer")
-    public ResponseEntity<Response<String>> registerCustomer(@RequestParam("user") String data) throws IOException {
-        return register(null, data);
-    }
-
     @PostMapping("/register")
-    public ResponseEntity<Response<String>> register(@RequestParam("file") MultipartFile file, @RequestParam("user") String data) throws IOException {
+    public ResponseEntity<Response<String>> register(@RequestParam(value = "file", required = false) MultipartFile file, @RequestParam("user") String data) throws IOException {
         SignupDto dto = new ObjectMapper().readValue(data, SignupDto.class);
 
         if (userRepository.existsUserByUsername(dto.getUsername()))

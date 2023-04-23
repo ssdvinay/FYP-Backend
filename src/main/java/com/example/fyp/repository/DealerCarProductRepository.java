@@ -4,9 +4,11 @@ import com.example.fyp.dto.Showroom;
 import com.example.fyp.entity.DealerAssociationId;
 import com.example.fyp.entity.DealerCarProduct;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
@@ -30,4 +32,17 @@ public interface DealerCarProductRepository extends JpaRepository<DealerCarProdu
                                       @Param("productTypes") Set<Long> productTypes,
                                       @Param("numCarTypes") long numCarTypes,
                                       @Param("numProductTypes") long numProductTypes);
+
+    @Query("select d.dealerAssociationId.carTypeId from DealerCarProduct d where d.dealerAssociationId.dealerId = :dealerId group by d.dealerAssociationId.carTypeId")
+    List<Long> findSupportedCarTypesByDealer(@Param("dealerId") Long dealerId);
+
+    @Query("select d.dealerAssociationId.productTypeId from DealerCarProduct d where d.dealerAssociationId.dealerId = :dealerId group by d.dealerAssociationId.productTypeId")
+    List<Long> findSupportedProductTypesByDealer(@Param("dealerId") Long dealerId);
+
+    @Query("select  d.price from DealerCarProduct d where d.dealerAssociationId.dealerId = :dealerId group by d.price")
+    Double findPriceByDealerId(@Param("dealerId") Long dealerId);
+    @Transactional
+    @Modifying
+    @Query("delete from DealerCarProduct d where d.dealerAssociationId.dealerId = :dealerId")
+    void deleteAllByDealerId(@Param("dealerId") Long dealerId);
 }
