@@ -17,6 +17,8 @@ public class Dealer {
 
     private String showroomPicture;
 
+    private int complaints;
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id", referencedColumnName = "id")
     private User user;
@@ -71,5 +73,13 @@ public class Dealer {
 
     public void setShowroomPicture(String showroomPicture) {
         this.showroomPicture = showroomPicture;
+    }
+
+    public int getComplaints() {
+        return complaints;
+    }
+
+    public void setComplaints(int complaints) {
+        this.complaints = complaints;
     }
 }

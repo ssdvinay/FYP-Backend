@@ -1,5 +1,6 @@
 package com.example.fyp.repository;
 
+import com.example.fyp.dto.DealerComplaintsCount;
 import com.example.fyp.entity.Dealer;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -17,6 +18,8 @@ public interface DealerRepository extends JpaRepository<Dealer, Long> {
     Dealer findByEmailOrUsername(@Param("emailOrUsername") String emailOrUsername);
 
     Dealer findDealerById(Long id);
+    @Query("select  d from Dealer d where d.approvalStatus = 'APPROVED' and d.user.isBlacklisted = false")
+    List<Dealer> findActiveDealers();
 
     List<Dealer> findDealersByApprovalStatus(String approvalStatus);
 
@@ -24,4 +27,7 @@ public interface DealerRepository extends JpaRepository<Dealer, Long> {
     @Modifying
     @Query("update Dealer d set d.approvalStatus=:status where d.id=:id")
     void updateDealerRegistrationStatus(@Param("id") Long id, @Param("status") String status);
+
+    @Query("select new com.example.fyp.dto.DealerComplaintsCount(CONCAT(d.user.firstName, ' ', d.user.lastName), d.complaints) from Dealer d")
+    List<DealerComplaintsCount> findAllNumberOfDealerComplaints();
 }

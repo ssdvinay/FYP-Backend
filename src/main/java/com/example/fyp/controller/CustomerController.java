@@ -3,13 +3,12 @@ package com.example.fyp.controller;
 import com.example.fyp.CustomerUpdateDto;
 import com.example.fyp.Response;
 import com.example.fyp.Util;
-import com.example.fyp.dto.Showroom;
-import com.example.fyp.dto.ShowroomFilters;
+import com.example.fyp.dto.*;
 import com.example.fyp.entity.Customer;
+import com.example.fyp.entity.Dealer;
+import com.example.fyp.entity.DealerComplaint;
 import com.example.fyp.entity.User;
-import com.example.fyp.repository.CustomerRepository;
-import com.example.fyp.repository.DealerCarProductRepository;
-import com.example.fyp.repository.UserRepository;
+import com.example.fyp.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -18,13 +17,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @CrossOrigin(origins = "*")
 @RequestMapping("/customer")
@@ -35,13 +32,25 @@ public class CustomerController {
     private final CustomerRepository customerRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
+    private final DealerRepository dealerRepository;
+    private final DealerComplaintRepository dealerComplaintRepository;
+    private final HttpServletRequest request;
 
     @Autowired
-    public CustomerController(DealerCarProductRepository dealerCarProductRepository, CustomerRepository customerRepository, PasswordEncoder passwordEncoder, UserRepository userRepository) {
+    public CustomerController(DealerCarProductRepository dealerCarProductRepository,
+                              CustomerRepository customerRepository,
+                              PasswordEncoder passwordEncoder,
+                              UserRepository userRepository,
+                              DealerRepository dealerRepository,
+                              DealerComplaintRepository dealerComplaintRepository,
+                              HttpServletRequest request) {
         this.dealerCarProductRepository = dealerCarProductRepository;
         this.customerRepository = customerRepository;
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
+        this.dealerRepository = dealerRepository;
+        this.dealerComplaintRepository = dealerComplaintRepository;
+        this.request = request;
     }
 
     @PutMapping("/showrooms")
@@ -56,6 +65,41 @@ public class CustomerController {
                 productTypeFilters,
                 numCarTypes,
                 numProductTypes);
+    }
+
+    @PutMapping("/complain")
+    public ResponseEntity<Response<String>> complain(@RequestBody Complaint complaint) {
+        String authorizationHeader = request.getHeader("Authorization");
+        String encodedCredentials = authorizationHeader.substring("Basic".length()).trim();
+        String decodedCredentials = new String(Base64.getDecoder().decode(encodedCredentials));
+        String emailOrUsername = decodedCredentials.split(":")[0];
+        Customer customer = this.customerRepository.findCustomerByEmailOrUsername(emailOrUsername);
+        DealerComplaint dealerComplaint = new DealerComplaint();
+        dealerComplaint.setDealerId(complaint.getDealerId());
+        dealerComplaint.setCustomerId(customer.getId());
+        dealerComplaint.setComplaint(complaint.getComplaint());
+        this.dealerComplaintRepository.save(dealerComplaint);
+        Dealer dealer = this.dealerRepository.findDealerById(complaint.getDealerId());
+        dealer.setComplaints(dealer.getComplaints() + 1);
+        if (dealer.getComplaints() >= 3)
+            dealer.getUser().setBlacklisted(true);
+        this.dealerRepository.save(dealer);
+        return new ResponseEntity<>(new Response<>("Complaint lodged successfully!"), HttpStatus.OK);
+    }
+
+    @GetMapping("/dealers")
+    public List<Dealer> getAllDealers() {
+        return this.dealerRepository.findActiveDealers();
+    }
+
+    @GetMapping("/complaints")
+    public List<CustomerComplaint> getAllComplains() {
+        return this.dealerComplaintRepository.findAllCustomerComplaints();
+    }
+
+    @GetMapping("/complaints/count")
+    public List<DealerComplaintsCount> getComplainsCount() {
+        return this.dealerRepository.findAllNumberOfDealerComplaints();
     }
 
     @GetMapping("/image/{dealerId}/{filename}")
