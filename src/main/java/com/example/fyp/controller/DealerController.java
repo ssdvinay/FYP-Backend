@@ -3,6 +3,7 @@ package com.example.fyp.controller;
 import com.example.fyp.Response;
 import com.example.fyp.UpdateDto;
 import com.example.fyp.Util;
+import com.example.fyp.dto.MyCustomer;
 import com.example.fyp.entity.*;
 import com.example.fyp.repository.BookingRepository;
 import com.example.fyp.repository.DealerCarProductRepository;
@@ -60,6 +61,11 @@ public class DealerController {
     @GetMapping("/bookings")
     public List<Booking> getDealerBookings() {
         return this.bookingRepository.findBookingsByDealerIdOrderByCreatedAtDesc(getDealerId());
+    }
+
+    @GetMapping("/myCustomers")
+    public List<MyCustomer> getMyCustomers() {
+        return this.bookingRepository.getMyCustomers(getDealerId());
     }
 
     @PutMapping("/bookings/{id}/update-status")

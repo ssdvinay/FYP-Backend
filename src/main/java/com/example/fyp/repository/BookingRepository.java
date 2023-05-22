@@ -1,5 +1,6 @@
 package com.example.fyp.repository;
 
+import com.example.fyp.dto.MyCustomer;
 import com.example.fyp.entity.Booking;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -19,4 +20,9 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Modifying
     @Query("update Booking b set b.bookingStatus = :status where b.id = :id")
     void updateBookingStatus(@Param("id") long id, @Param("status") String status);
+
+    @Query("select new com.example.fyp.dto.MyCustomer(CONCAT(b.customer.user.firstName, ' ', b.customer.user.lastName), b.customer.user.phoneNumber, b.customer.user.email, count(b)) from Booking b " +
+            "where b.dealerAssociationId.dealerId = :dealerId " +
+            "group by b.customerId")
+    List<MyCustomer> getMyCustomers(@Param("dealerId") long dealerId);
 }
