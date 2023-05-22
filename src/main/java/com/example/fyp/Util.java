@@ -1,5 +1,8 @@
 package com.example.fyp;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.Base64;
+
 public class Util {
 
     public static String getRootCause(Throwable throwable) {
@@ -22,5 +25,12 @@ public class Util {
 
     private static double deg2rad(double deg) {
         return deg * (Math.PI / 180);
+    }
+
+    public static String getEmailOrUserNameFromRequest(HttpServletRequest request) {
+        String authorizationHeader = request.getHeader("Authorization");
+        String encodedCredentials = authorizationHeader.substring("Basic".length()).trim();
+        String decodedCredentials = new String(Base64.getDecoder().decode(encodedCredentials));
+        return decodedCredentials.split(":")[0];
     }
 }

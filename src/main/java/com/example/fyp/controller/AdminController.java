@@ -3,9 +3,9 @@ package com.example.fyp.controller;
 import com.example.fyp.Response;
 import com.example.fyp.Util;
 import com.example.fyp.entity.Booking;
-import com.example.fyp.entity.BookingRepository;
 import com.example.fyp.entity.Customer;
 import com.example.fyp.entity.Dealer;
+import com.example.fyp.repository.BookingRepository;
 import com.example.fyp.repository.CustomerRepository;
 import com.example.fyp.repository.DealerRepository;
 import com.example.fyp.repository.UserRepository;
@@ -27,7 +27,9 @@ public class AdminController {
     private final BookingRepository bookingRepository;
 
     @Autowired
-    public AdminController(UserRepository userRepository, DealerRepository dealerRepository, CustomerRepository customerRepository,
+    public AdminController(UserRepository userRepository,
+                           DealerRepository dealerRepository,
+                           CustomerRepository customerRepository,
                            BookingRepository bookingRepository) {
         this.userRepository = userRepository;
         this.dealerRepository = dealerRepository;
@@ -83,14 +85,8 @@ public class AdminController {
     }
 
     @GetMapping("/bookings")
-    public ResponseEntity<Response<List<Booking>>> getAllBookings() {
-        try {
-            List<Booking> bookingList = bookingRepository.findAll();
-            return new ResponseEntity<>(new Response<>(bookingList), HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(new Response<>(Util.getRootCause(e)),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public List<Booking> getAllBookings() {
+        return this.bookingRepository.findAll();
     }
 
     @GetMapping("/pending-requests")

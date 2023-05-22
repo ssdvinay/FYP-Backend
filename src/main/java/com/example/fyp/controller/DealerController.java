@@ -3,10 +3,8 @@ package com.example.fyp.controller;
 import com.example.fyp.Response;
 import com.example.fyp.UpdateDto;
 import com.example.fyp.Util;
-import com.example.fyp.entity.Dealer;
-import com.example.fyp.entity.DealerAssociationId;
-import com.example.fyp.entity.DealerCarProduct;
-import com.example.fyp.entity.User;
+import com.example.fyp.entity.*;
+import com.example.fyp.repository.BookingRepository;
 import com.example.fyp.repository.DealerCarProductRepository;
 import com.example.fyp.repository.DealerRepository;
 import com.example.fyp.repository.UserRepository;
@@ -21,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -44,12 +43,39 @@ public class DealerController {
 
     private final PasswordEncoder passwordEncoder;
 
+    private final BookingRepository bookingRepository;
+
+    private final HttpServletRequest request;
+
     @Autowired
-    public DealerController(DealerRepository dealerRepository, DealerCarProductRepository dealerCarProductRepository, UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public DealerController(DealerRepository dealerRepository, DealerCarProductRepository dealerCarProductRepository, UserRepository userRepository, PasswordEncoder passwordEncoder, BookingRepository bookingRepository, HttpServletRequest request) {
         this.dealerRepository = dealerRepository;
         this.dealerCarProductRepository = dealerCarProductRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.bookingRepository = bookingRepository;
+        this.request = request;
+    }
+
+    @GetMapping("/bookings")
+    public List<Booking> getDealerBookings() {
+        return this.bookingRepository.findBookingsByDealerIdOrderByCreatedAtDesc(getDealerId());
+    }
+
+    @PutMapping("/bookings/{id}/update-status")
+    public ResponseEntity<Response<String>> updateDealerRegistrationStatus(@PathVariable("id") Long bookingId,
+                                                                           @RequestParam("status") String status) {
+        try {
+            bookingRepository.updateBookingStatus(bookingId, status);
+            return new ResponseEntity<>(new Response<>("Booking Status updated", null), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new Response<>(Util.getRootCause(e)),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    private long getDealerId() {
+        return dealerRepository.findByEmailOrUsername(Util.getEmailOrUserNameFromRequest(request)).getId();
     }
 
     @PutMapping("/update")

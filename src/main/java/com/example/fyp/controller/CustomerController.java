@@ -4,10 +4,7 @@ import com.example.fyp.CustomerUpdateDto;
 import com.example.fyp.Response;
 import com.example.fyp.Util;
 import com.example.fyp.dto.*;
-import com.example.fyp.entity.Customer;
-import com.example.fyp.entity.Dealer;
-import com.example.fyp.entity.DealerComplaint;
-import com.example.fyp.entity.User;
+import com.example.fyp.entity.*;
 import com.example.fyp.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -34,6 +31,8 @@ public class CustomerController {
     private final UserRepository userRepository;
     private final DealerRepository dealerRepository;
     private final DealerComplaintRepository dealerComplaintRepository;
+
+    private final BookingRepository bookingRepository;
     private final HttpServletRequest request;
 
     @Autowired
@@ -43,13 +42,14 @@ public class CustomerController {
                               UserRepository userRepository,
                               DealerRepository dealerRepository,
                               DealerComplaintRepository dealerComplaintRepository,
-                              HttpServletRequest request) {
+                              BookingRepository bookingRepository, HttpServletRequest request) {
         this.dealerCarProductRepository = dealerCarProductRepository;
         this.customerRepository = customerRepository;
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
         this.dealerRepository = dealerRepository;
         this.dealerComplaintRepository = dealerComplaintRepository;
+        this.bookingRepository = bookingRepository;
         this.request = request;
     }
 
@@ -67,16 +67,37 @@ public class CustomerController {
                 numProductTypes);
     }
 
+    @GetMapping("dealers/{id}/carTypes")
+    public List<CarType> getSupportedCarTypesByDealerId(@PathVariable("id") Long id) {
+        return dealerCarProductRepository.getSupportedCarTypesOfDealer(id);
+    }
+
+    @GetMapping("dealers/{id}/productTypes")
+    public List<ProductType> getSupportedProductTypesByDealerId(@PathVariable("id") Long id) {
+        return dealerCarProductRepository.getSupportedProductTypesOfDealer(id);
+    }
+
+    @PostMapping("/booking")
+    public ResponseEntity<Response<String>> saveBooking(@RequestBody Booking booking) {
+        booking.setCustomerId(getCustomerId());
+        try {
+            this.bookingRepository.save(booking);
+            return new ResponseEntity<>(new Response<>("Booking successfully created", ""), HttpStatus.OK);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(new Response<>("unable to create booking", ""), HttpStatus.OK);
+        }
+    }
+
+    @GetMapping("/bookings")
+    public List<Booking> findCustomerBookings() {
+        return this.bookingRepository.findBookingsByCustomerIdOrderByCreatedAtDesc(getCustomerId());
+    }
+
     @PutMapping("/complain")
     public ResponseEntity<Response<String>> complain(@RequestBody Complaint complaint) {
-        String authorizationHeader = request.getHeader("Authorization");
-        String encodedCredentials = authorizationHeader.substring("Basic".length()).trim();
-        String decodedCredentials = new String(Base64.getDecoder().decode(encodedCredentials));
-        String emailOrUsername = decodedCredentials.split(":")[0];
-        Customer customer = this.customerRepository.findCustomerByEmailOrUsername(emailOrUsername);
         DealerComplaint dealerComplaint = new DealerComplaint();
         dealerComplaint.setDealerId(complaint.getDealerId());
-        dealerComplaint.setCustomerId(customer.getId());
+        dealerComplaint.setCustomerId(getCustomerId());
         dealerComplaint.setComplaint(complaint.getComplaint());
         this.dealerComplaintRepository.save(dealerComplaint);
         Dealer dealer = this.dealerRepository.findDealerById(complaint.getDealerId());
@@ -162,5 +183,9 @@ public class CustomerController {
         customer.setUser(user);
         customerRepository.save(customer);
         return new ResponseEntity<>(new Response<>("Customer Updated Successfully"), HttpStatus.OK);
+    }
+
+    private long getCustomerId() {
+        return customerRepository.findCustomerByEmailOrUsername(Util.getEmailOrUserNameFromRequest(request)).getId();
     }
 }

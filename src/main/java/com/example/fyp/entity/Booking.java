@@ -1,9 +1,6 @@
 package com.example.fyp.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 public class Booking {
@@ -23,6 +20,22 @@ public class Booking {
     private String bookingDate;
 
     private String createdAt;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "dealerId", referencedColumnName = "id", nullable = false, updatable = false, insertable = false)
+    private Dealer dealer;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "customerId", referencedColumnName = "id", nullable = false, updatable = false, insertable = false)
+    private Customer customer;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "carTypeId", referencedColumnName = "id", nullable = false, updatable = false, insertable = false)
+    private CarType carType;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "productTypeId", referencedColumnName = "id", nullable = false, updatable = false, insertable = false)
+    private ProductType productType;
 
     public Long getId() {
         return id;
@@ -78,5 +91,37 @@ public class Booking {
 
     public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public Dealer getDealer() {
+        return dealer;
+    }
+
+    public void setDealer(Dealer dealer) {
+        this.dealer = dealer;
+    }
+
+    public ProductType getProductType() {
+        return productType;
+    }
+
+    public void setProductType(ProductType productType) {
+        this.productType = productType;
+    }
+
+    public CarType getCarType() {
+        return carType;
+    }
+
+    public void setCarType(CarType carType) {
+        this.carType = carType;
+    }
+
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
     }
 }

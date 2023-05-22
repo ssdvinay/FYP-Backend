@@ -1,8 +1,10 @@
 package com.example.fyp.repository;
 
 import com.example.fyp.dto.Showroom;
+import com.example.fyp.entity.CarType;
 import com.example.fyp.entity.DealerAssociationId;
 import com.example.fyp.entity.DealerCarProduct;
+import com.example.fyp.entity.ProductType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -41,8 +43,19 @@ public interface DealerCarProductRepository extends JpaRepository<DealerCarProdu
 
     @Query("select  d.price from DealerCarProduct d where d.dealerAssociationId.dealerId = :dealerId group by d.price")
     Double findPriceByDealerId(@Param("dealerId") Long dealerId);
+
     @Transactional
     @Modifying
     @Query("delete from DealerCarProduct d where d.dealerAssociationId.dealerId = :dealerId")
     void deleteAllByDealerId(@Param("dealerId") Long dealerId);
+
+    @Query("select d.carType from DealerCarProduct d " +
+            "where d.dealerAssociationId.dealerId = :dealerId " +
+            "group by d.dealerAssociationId.carTypeId")
+    List<CarType> getSupportedCarTypesOfDealer(@Param("dealerId") long dealerId);
+
+    @Query("select d.productType from DealerCarProduct d " +
+            "where d.dealerAssociationId.dealerId = :dealerId " +
+            "group by d.dealerAssociationId.productTypeId")
+    List<ProductType> getSupportedProductTypesOfDealer(@Param("dealerId") long dealerId);
 }
