@@ -20,6 +20,8 @@ public class Booking {
     private String bookingDate;
 
     private String createdAt;
+    
+    private String feedback;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "dealerId", referencedColumnName = "id", nullable = false, updatable = false, insertable = false)
@@ -123,5 +125,13 @@ public class Booking {
 
     public void setCustomer(Customer customer) {
         this.customer = customer;
+    }
+
+    public String getFeedback() {
+        return feedback;
+    }
+
+    public void setFeedback(String feedback) {
+        this.feedback = feedback;
     }
 }

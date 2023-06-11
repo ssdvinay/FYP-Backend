@@ -88,6 +88,15 @@ public class CustomerController {
         }
     }
 
+    @PutMapping("/booking/feedback")
+    public ResponseEntity<Response<String>> submitFeedback(@RequestBody Feedback feedback) {
+        Booking booking = this.bookingRepository.getReferenceById(feedback.getBookingId());
+        booking.setFeedback(feedback.getFeedback());
+        this.bookingRepository.save(booking);
+        return new ResponseEntity<>(new Response<>("Successfully submitted feedback!"), HttpStatus.OK);
+    }
+
+
     @GetMapping("/bookings")
     public List<Booking> findCustomerBookings() {
         return this.bookingRepository.findBookingsByCustomerIdOrderByCreatedAtDesc(getCustomerId());
