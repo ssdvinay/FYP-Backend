@@ -3,12 +3,10 @@ package com.example.fyp.controller;
 import com.example.fyp.Response;
 import com.example.fyp.UpdateDto;
 import com.example.fyp.Util;
+import com.example.fyp.dto.CustomerComplaint;
 import com.example.fyp.dto.MyCustomer;
 import com.example.fyp.entity.*;
-import com.example.fyp.repository.BookingRepository;
-import com.example.fyp.repository.DealerCarProductRepository;
-import com.example.fyp.repository.DealerRepository;
-import com.example.fyp.repository.UserRepository;
+import com.example.fyp.repository.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -47,15 +45,22 @@ public class DealerController {
     private final BookingRepository bookingRepository;
 
     private final HttpServletRequest request;
+    private final DealerComplaintRepository dealerComplaintRepository;
 
     @Autowired
-    public DealerController(DealerRepository dealerRepository, DealerCarProductRepository dealerCarProductRepository, UserRepository userRepository, PasswordEncoder passwordEncoder, BookingRepository bookingRepository, HttpServletRequest request) {
+    public DealerController(DealerRepository dealerRepository, DealerCarProductRepository dealerCarProductRepository, UserRepository userRepository, PasswordEncoder passwordEncoder, BookingRepository bookingRepository, HttpServletRequest request, DealerComplaintRepository dealerComplaintRepository) {
         this.dealerRepository = dealerRepository;
         this.dealerCarProductRepository = dealerCarProductRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.bookingRepository = bookingRepository;
         this.request = request;
+        this.dealerComplaintRepository = dealerComplaintRepository;
+    }
+
+    @GetMapping("/complaints")
+    public List<CustomerComplaint> getAllComplains() {
+        return this.dealerComplaintRepository.findAllCustomerComplaintsByDealerId(getDealerId());
     }
 
     @GetMapping("/bookings")

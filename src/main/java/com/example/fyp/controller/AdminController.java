@@ -2,13 +2,12 @@ package com.example.fyp.controller;
 
 import com.example.fyp.Response;
 import com.example.fyp.Util;
+import com.example.fyp.dto.CustomerComplaint;
+import com.example.fyp.dto.DealerComplaintsCount;
 import com.example.fyp.entity.Booking;
 import com.example.fyp.entity.Customer;
 import com.example.fyp.entity.Dealer;
-import com.example.fyp.repository.BookingRepository;
-import com.example.fyp.repository.CustomerRepository;
-import com.example.fyp.repository.DealerRepository;
-import com.example.fyp.repository.UserRepository;
+import com.example.fyp.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,16 +24,18 @@ public class AdminController {
     private final DealerRepository dealerRepository;
     private final CustomerRepository customerRepository;
     private final BookingRepository bookingRepository;
+    private final DealerComplaintRepository dealerComplaintRepository;
 
     @Autowired
     public AdminController(UserRepository userRepository,
                            DealerRepository dealerRepository,
                            CustomerRepository customerRepository,
-                           BookingRepository bookingRepository) {
+                           BookingRepository bookingRepository, DealerComplaintRepository dealerComplaintRepository) {
         this.userRepository = userRepository;
         this.dealerRepository = dealerRepository;
         this.customerRepository = customerRepository;
         this.bookingRepository = bookingRepository;
+        this.dealerComplaintRepository = dealerComplaintRepository;
     }
 
     @PutMapping("/blacklist/{id}")
@@ -47,6 +48,16 @@ public class AdminController {
         } catch (Exception e) {
             return new ResponseEntity<>(new Response<>("Could not updated user because:\n" + Util.getRootCause(e)), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @GetMapping("/complaints")
+    public List<CustomerComplaint> getAllComplains() {
+        return this.dealerComplaintRepository.findAllCustomerComplaints();
+    }
+
+    @GetMapping("/complaints/count")
+    public List<DealerComplaintsCount> getComplainsCount() {
+        return this.dealerRepository.findAllNumberOfDealerComplaints();
     }
 
     @GetMapping("/dealers")

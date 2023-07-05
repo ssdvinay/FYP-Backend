@@ -122,16 +122,6 @@ public class CustomerController {
         return this.dealerRepository.findActiveDealers();
     }
 
-    @GetMapping("/complaints")
-    public List<CustomerComplaint> getAllComplains() {
-        return this.dealerComplaintRepository.findAllCustomerComplaints();
-    }
-
-    @GetMapping("/complaints/count")
-    public List<DealerComplaintsCount> getComplainsCount() {
-        return this.dealerRepository.findAllNumberOfDealerComplaints();
-    }
-
     @GetMapping("/image/{dealerId}/{filename}")
     public ResponseEntity<Resource> getImage(@PathVariable long dealerId, @PathVariable String filename) {
         try {
