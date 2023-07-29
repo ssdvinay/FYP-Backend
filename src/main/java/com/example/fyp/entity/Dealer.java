@@ -1,7 +1,6 @@
 package com.example.fyp.entity;
 
 import javax.persistence.*;
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -25,6 +24,10 @@ public class Dealer {
 
     @OneToMany(mappedBy = "dealer")
     private Set<DealerCarProduct> dealerCarProductList;
+
+    private double latitude;
+
+    private double longitude;
 
 
     public User getUser() {
@@ -81,5 +84,21 @@ public class Dealer {
 
     public void setComplaints(int complaints) {
         this.complaints = complaints;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
     }
 }

@@ -90,6 +90,8 @@ public class AuthController {
                 dealer.setShowRoomAddress(dto.getAddress());
                 dealer.setApprovalStatus("PENDING");
                 dealer.setShowroomPicture(file.getOriginalFilename());
+                dealer.setLatitude(dto.getLatitude());
+                dealer.setLongitude(dto.getLongitude());
                 dealerRepository.save(dealer);
                 List<DealerCarProduct> dealerCarProductList = new ArrayList<>();
                 for (Long carType : dto.getSupportedCarTypes()) {

@@ -133,6 +133,8 @@ public class DealerController {
         dealer.setId(user.getId());
         dealer.setUser(user);
         dealer.setShowRoomAddress(dto.getAddress());
+        dealer.setLatitude(dto.getLatitude());
+        dealer.setLongitude(dto.getLongitude());
         dealer.setApprovalStatus(existingDealer.getApprovalStatus());
         List<DealerCarProduct> dealerCarProductList = new ArrayList<>();
         for (Long carType : dto.getSupportedCarTypes()) {
@@ -178,6 +180,8 @@ public class DealerController {
             updateDto.setAddress(dealer.getShowRoomAddress());
             updateDto.setShowroomPicture(dealer.getShowroomPicture());
             updateDto.setPrice(price);
+            updateDto.setLatitude(dealer.getLatitude());
+            updateDto.setLongitude(dealer.getLongitude());
             return new ResponseEntity<>(new Response<>(updateDto), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new Response<>(Util.getRootCause(e)), HttpStatus.INTERNAL_SERVER_ERROR);

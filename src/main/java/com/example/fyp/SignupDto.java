@@ -14,8 +14,9 @@ public class SignupDto {
     private List<Long> supportedCarTypes;
     private List<Long> supportedProductTypes;
     private double price;
-
     private boolean blacklisted;
+    private double latitude;
+    private double longitude;
 
     public String getFirstName() {
         return firstName;
@@ -120,5 +121,21 @@ public class SignupDto {
 
     public void setBlacklisted(boolean blacklisted) {
         this.blacklisted = blacklisted;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
     }
 }
