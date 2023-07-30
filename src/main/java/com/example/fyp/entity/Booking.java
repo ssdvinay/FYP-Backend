@@ -19,6 +19,8 @@ public class Booking {
 
     private String bookingDate;
 
+    private String bookingTime;
+
     private String createdAt;
     
     private String feedback;
@@ -133,5 +135,13 @@ public class Booking {
 
     public void setFeedback(String feedback) {
         this.feedback = feedback;
+    }
+
+    public String getBookingTime() {
+        return bookingTime;
+    }
+
+    public void setBookingTime(String bookingTime) {
+        this.bookingTime = bookingTime;
     }
 }

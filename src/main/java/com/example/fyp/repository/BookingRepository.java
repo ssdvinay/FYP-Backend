@@ -16,6 +16,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> findBookingsByDealerIdOrderByCreatedAtDesc(long dealerId);
 
+    List<Booking> findBookingsByBookingDateAndDealerIdAndBookingStatusIsNot(String bookingDate, Long dealerId, String bookingStatus);
+
     @Transactional
     @Modifying
     @Query("update Booking b set b.bookingStatus = :status where b.id = :id")

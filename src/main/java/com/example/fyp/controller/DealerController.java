@@ -5,6 +5,7 @@ import com.example.fyp.UpdateDto;
 import com.example.fyp.Util;
 import com.example.fyp.dto.CustomerComplaint;
 import com.example.fyp.dto.MyCustomer;
+import com.example.fyp.dto.WorkHour;
 import com.example.fyp.entity.*;
 import com.example.fyp.repository.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -47,8 +48,10 @@ public class DealerController {
     private final HttpServletRequest request;
     private final DealerComplaintRepository dealerComplaintRepository;
 
+    private final DealerWorkHourRepository dealerWorkHourRepository;
+
     @Autowired
-    public DealerController(DealerRepository dealerRepository, DealerCarProductRepository dealerCarProductRepository, UserRepository userRepository, PasswordEncoder passwordEncoder, BookingRepository bookingRepository, HttpServletRequest request, DealerComplaintRepository dealerComplaintRepository) {
+    public DealerController(DealerRepository dealerRepository, DealerCarProductRepository dealerCarProductRepository, UserRepository userRepository, PasswordEncoder passwordEncoder, BookingRepository bookingRepository, HttpServletRequest request, DealerComplaintRepository dealerComplaintRepository, DealerWorkHourRepository dealerWorkHourRepository) {
         this.dealerRepository = dealerRepository;
         this.dealerCarProductRepository = dealerCarProductRepository;
         this.userRepository = userRepository;
@@ -56,6 +59,24 @@ public class DealerController {
         this.bookingRepository = bookingRepository;
         this.request = request;
         this.dealerComplaintRepository = dealerComplaintRepository;
+        this.dealerWorkHourRepository = dealerWorkHourRepository;
+    }
+
+    @PostMapping("/hours")
+    public ResponseEntity<Response<String>> saveWorkHours(@RequestBody List<WorkHour> workHourList) {
+        long dealerId = getDealerId();
+        List<DealerWorkHour> dealerWorkHours = workHourList.stream().map(workHour -> {
+            DealerWorkHour dwh = new DealerWorkHour();
+            DealerWorkHourId dealerWorkHourId = new DealerWorkHourId();
+            dealerWorkHourId.dealerId = dealerId;
+            dealerWorkHourId.day = workHour.day();
+            dwh.setDealerWorkHourId(dealerWorkHourId);
+            dwh.setWorkFrom(workHour.workFrom());
+            dwh.setWorkTo(workHour.workTo());
+            return dwh;
+        }).toList();
+        dealerWorkHourRepository.saveAll(dealerWorkHours);
+        return new ResponseEntity<>(new Response<>("Success!"), HttpStatus.OK);
     }
 
     @GetMapping("/complaints")

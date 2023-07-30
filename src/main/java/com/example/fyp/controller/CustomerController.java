@@ -18,7 +18,10 @@ import javax.servlet.http.HttpServletRequest;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @CrossOrigin(origins = "*")
 @RequestMapping("/customer")
@@ -35,6 +38,8 @@ public class CustomerController {
     private final BookingRepository bookingRepository;
     private final HttpServletRequest request;
 
+    private final DealerWorkHourRepository dealerWorkHourRepository;
+
     @Autowired
     public CustomerController(DealerCarProductRepository dealerCarProductRepository,
                               CustomerRepository customerRepository,
@@ -42,7 +47,7 @@ public class CustomerController {
                               UserRepository userRepository,
                               DealerRepository dealerRepository,
                               DealerComplaintRepository dealerComplaintRepository,
-                              BookingRepository bookingRepository, HttpServletRequest request) {
+                              BookingRepository bookingRepository, HttpServletRequest request, DealerWorkHourRepository dealerWorkHourRepository) {
         this.dealerCarProductRepository = dealerCarProductRepository;
         this.customerRepository = customerRepository;
         this.passwordEncoder = passwordEncoder;
@@ -51,6 +56,7 @@ public class CustomerController {
         this.dealerComplaintRepository = dealerComplaintRepository;
         this.bookingRepository = bookingRepository;
         this.request = request;
+        this.dealerWorkHourRepository = dealerWorkHourRepository;
     }
 
     @PutMapping("/showrooms")
@@ -86,6 +92,22 @@ public class CustomerController {
         } catch (Exception ex) {
             return new ResponseEntity<>(new Response<>("unable to create booking", ""), HttpStatus.OK);
         }
+    }
+
+    @GetMapping("/{dealerId}/bookings")
+    public List<String> getDealerBookingTimesOnDate(@PathVariable Long dealerId, @RequestParam("date") String date) {
+        return this.bookingRepository.findBookingsByBookingDateAndDealerIdAndBookingStatusIsNot(date, dealerId, "CANCELLED")
+                .stream()
+                .map(Booking::getBookingTime)
+                .toList();
+    }
+
+    @GetMapping("/dealers/{dealerId}/hours")
+    public List<WorkHour> getDealerWorkHours(@PathVariable Long dealerId) {
+        return this.dealerWorkHourRepository.getDealerWorkHourByDealerWorkHourId_DealerId(dealerId)
+                .stream()
+                .map(dwh -> new WorkHour(dwh.getDealerWorkHourId().day, dwh.getWorkFrom(), dwh.getWorkTo()))
+                .toList();
     }
 
     @PutMapping("/booking/feedback")
