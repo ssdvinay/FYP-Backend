@@ -114,6 +114,7 @@ public class CustomerController {
     public ResponseEntity<Response<String>> submitFeedback(@RequestBody Feedback feedback) {
         Booking booking = this.bookingRepository.getReferenceById(feedback.getBookingId());
         booking.setFeedback(feedback.getFeedback());
+        booking.setRating(feedback.getRating());
         this.bookingRepository.save(booking);
         return new ResponseEntity<>(new Response<>("Successfully submitted feedback!"), HttpStatus.OK);
     }

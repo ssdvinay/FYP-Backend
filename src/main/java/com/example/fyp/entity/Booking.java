@@ -25,6 +25,8 @@ public class Booking {
     
     private String feedback;
 
+    private int rating;
+
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "dealerId", referencedColumnName = "id", nullable = false, updatable = false, insertable = false)
     private Dealer dealer;
@@ -143,5 +145,13 @@ public class Booking {
 
     public void setBookingTime(String bookingTime) {
         this.bookingTime = bookingTime;
+    }
+
+    public int getRating() {
+        return rating;
+    }
+
+    public void setRating(int rating) {
+        this.rating = rating;
     }
 }
