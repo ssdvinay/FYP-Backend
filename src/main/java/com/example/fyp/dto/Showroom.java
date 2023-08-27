@@ -5,16 +5,16 @@ import com.example.fyp.entity.Dealer;
 public class Showroom {
 
     private final Dealer dealer;
-    private final double price;
+    private final Double price;
 
-    private double rating;
+    private Double rating;
 
-    public Showroom(Dealer dealer, double price) {
+    public Showroom(Dealer dealer, Double price) {
         this.dealer = dealer;
         this.price = price;
     }
 
-    public double getPrice() {
+    public Double getPrice() {
         return price;
     }
 
@@ -22,11 +22,11 @@ public class Showroom {
         return dealer;
     }
 
-    public double getRating() {
+    public Double getRating() {
         return rating;
     }
 
-    public void setRating(double rating) {
+    public void setRating(Double rating) {
         this.rating = rating;
     }
 }
