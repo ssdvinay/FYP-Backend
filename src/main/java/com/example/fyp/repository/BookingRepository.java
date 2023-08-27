@@ -33,4 +33,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "where b.dealerAssociationId.dealerId = :dealerId " +
             "group by b.customerId")
     List<MyCustomer> getMyCustomers(@Param("dealerId") long dealerId);
+
+    @Query("select coalesce(avg(b.rating), 0) from Booking b where b.dealer.id = :dealerId and b.bookingStatus = 'CONFIRMED' group by b.dealer.id")
+    Double getDealerRating(@Param("dealerId") Long dealerId);
 }

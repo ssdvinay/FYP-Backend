@@ -65,12 +65,14 @@ public class CustomerController {
         int numProductTypes = showroomFilters.productTypes.size();
         Set<Long> carTypeFilters = new HashSet<>(showroomFilters.carTypes.isEmpty() ? Arrays.asList(1L, 2L, 3L) : showroomFilters.carTypes);
         Set<Long> productTypeFilters = new HashSet<>(showroomFilters.productTypes.isEmpty() ? Arrays.asList(1L, 2L, 3L) : showroomFilters.productTypes);
-        return this.dealerCarProductRepository.getFilteredDealers(showroomFilters.minPrice,
+        List<Showroom> showrooms = this.dealerCarProductRepository.getFilteredDealers(showroomFilters.minPrice,
                 showroomFilters.maxPrice,
                 carTypeFilters,
                 productTypeFilters,
                 numCarTypes,
                 numProductTypes);
+        showrooms.forEach(sr -> sr.setRating(bookingRepository.getDealerRating(sr.getDealer().getId())));
+        return showrooms;
     }
 
     @GetMapping("dealers/{id}/carTypes")
