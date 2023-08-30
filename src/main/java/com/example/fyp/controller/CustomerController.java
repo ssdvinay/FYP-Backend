@@ -129,7 +129,10 @@ public class CustomerController {
 
     @GetMapping("/dealer/{id}/bookings")
     public List<Booking> getDealerBookings(@PathVariable Long id) {
-        return this.bookingRepository.findBookingsByDealerIdOrderByCreatedAtDesc(id);
+        return this.bookingRepository.findBookingsByDealerIdOrderByCreatedAtDesc(id)
+                .stream()
+                .filter(booking -> booking.getBookingStatus().equals("CONFIRMED") && booking.getFeedback() != null && booking.getRating() > 0)
+                .toList();
     }
 
     @PutMapping("/complain")
