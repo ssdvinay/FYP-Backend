@@ -127,6 +127,11 @@ public class CustomerController {
         return this.bookingRepository.findBookingsByCustomerIdOrderByCreatedAtDesc(getCustomerId());
     }
 
+    @GetMapping("/dealer/{id}/bookings")
+    public List<Booking> getDealerBookings(@PathVariable Long id) {
+        return this.bookingRepository.findBookingsByDealerIdOrderByCreatedAtDesc(id);
+    }
+
     @PutMapping("/complain")
     public ResponseEntity<Response<String>> complain(@RequestBody Complaint complaint) {
         DealerComplaint dealerComplaint = new DealerComplaint();
